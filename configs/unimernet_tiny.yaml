@@ -1,0 +1,25 @@
+model:
+  arch: unimernet
+  model_type: unimernet
+  load_finetuned: False
+  load_pretrained: True
+  pretrained: "models/unimernet_tiny/unimernet_tiny.pth"
+  tokenizer_name: nougat
+  tokenizer_config:
+    path: models/unimernet_tiny
+  model_name: unimernet
+  model_config:
+    model_name: models/unimernet_tiny
+    max_seq_len: 1536
+
+datasets:
+  formula_rec_eval:
+    vis_processor:
+      eval:
+        name: "formula_image_eval"
+        image_size:
+          - 192
+          - 672
+
+run:
+  task: unimernet_train

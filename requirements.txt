@@ -1,0 +1,19 @@
+# PyTorch (install separately with CUDA support):
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+transformers==4.42.4
+timm>=0.9.16,<0.10.0
+opencv-python>=4.6.0
+albumentations>=1.4.4,<2.0.0
+omegaconf>=2.3.0,<3.0.0
+fairscale>=0.4.13,<0.5.0
+Pillow>=9.0.0
+numpy>=1.24.0
+unimernet[full]
+doclayout-yolo
+struct-eqtable>=0.3.0
+einops
+accelerate
+PyMuPDF>=1.24.0
+click>=8.0.0
+rich>=13.0.0
+matplotlib>=3.7.0

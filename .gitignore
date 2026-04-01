@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+
+# Virtual env / Conda local env markers
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Project outputs and large assets
+models/
+assets/
+output/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
