@@ -26,6 +26,7 @@ class MarkdownAssembler:
         images = images or {}
 
         merged = self._merge_title_blocks(blocks, contents)
+        self._merge_adjacent_plain_text(merged, contents)
 
         parts: list[str] = []
         for i, block in enumerate(merged):
@@ -72,6 +73,62 @@ class MarkdownAssembler:
                     skip.add(j)
 
         return blocks
+
+    def _merge_adjacent_plain_text(
+        self,
+        blocks: list[LayoutBlock],
+        contents: dict[int, str],
+    ) -> None:
+        """Join plain_text blocks that are one sentence split across columns.
+
+        When the first fragment does not end a sentence and the next starts with
+        a lowercase letter (or continues a hyphenated word), merge into the first.
+        Chains multiple fragments (A+B+C) in one pass.
+        """
+        i = 0
+        while i < len(blocks):
+            if blocks[i].category != "plain_text":
+                i += 1
+                continue
+            a = contents.get(i, "").strip()
+            if not a:
+                i += 1
+                continue
+            j = i + 1
+            while j < len(blocks):
+                if blocks[j].category != "plain_text":
+                    break
+                b = contents.get(j, "").strip()
+                if not b:
+                    j += 1
+                    continue
+                if not self._should_merge_plain_text_fragments(a, b):
+                    break
+                a = self._join_plain_text_fragments(a, b)
+                contents[i] = a
+                contents[j] = ""
+                j += 1
+            i += 1
+
+    @staticmethod
+    def _should_merge_plain_text_fragments(a: str, b: str) -> bool:
+        a = a.rstrip()
+        b = b.lstrip()
+        if not a or not b:
+            return False
+        if a.endswith("-"):
+            return True
+        if a[-1] in ".!?":
+            return False
+        return b[0].islower()
+
+    @staticmethod
+    def _join_plain_text_fragments(a: str, b: str) -> str:
+        a = a.rstrip()
+        b = b.lstrip()
+        if a.endswith("-"):
+            return (a[:-1].rstrip() + b).strip()
+        return (a + " " + b).strip()
 
     def _block_to_markdown(
         self,

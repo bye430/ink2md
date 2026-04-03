@@ -12,7 +12,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from .layout_detector import LayoutDetector, LayoutBlock
 from .inline_formula_detector import InlineFormulaDetector, FormulaRegion
-from .pdf_renderer import PDFRenderer
+from .pdf_renderer import PDFRenderer, normalize_flow_text
 from .recognizer import FormulaRecognizer
 from .table_recognizer import TableRecognizer
 from .md_assembler import MarkdownAssembler
@@ -193,7 +193,7 @@ class PDF2MarkdownPipeline:
                         inline_formula_regions, inline_latex_map,
                     )
 
-                contents[i] = raw_text
+                contents[i] = normalize_flow_text(raw_text)
 
         if isolated_formula_images:
             rgb_images = [img.convert("RGB") for img in isolated_formula_images]

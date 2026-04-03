@@ -1,5 +1,6 @@
 """PDF page rendering and text/image extraction using PyMuPDF."""
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,6 +17,39 @@ class PDFPage:
     width: float
     height: float
     dpi: int
+
+
+def normalize_flow_text(text: str) -> str:
+    """Turn PDF line breaks into flowing paragraphs.
+
+    - Paragraph breaks (blank lines) are preserved as ``\\n\\n``.
+    - Single newlines inside a paragraph become spaces.
+    - End-of-line hyphenation (``word-\\nnext``) is merged without the hyphen.
+    """
+    if not text or not text.strip():
+        return text.strip() if text else ""
+
+    paras = re.split(r"\n\s*\n+", text.strip())
+    out_paras: list[str] = []
+    for para in paras:
+        joined = _join_wrapped_lines_in_paragraph(para)
+        if joined:
+            out_paras.append(joined)
+    return "\n\n".join(out_paras)
+
+
+def _join_wrapped_lines_in_paragraph(para: str) -> str:
+    lines = [ln.strip() for ln in para.split("\n")]
+    lines = [ln for ln in lines if ln]
+    if not lines:
+        return ""
+    out = lines[0]
+    for ln in lines[1:]:
+        if out.rstrip().endswith("-"):
+            out = out.rstrip()[:-1].rstrip() + ln
+        else:
+            out = out + " " + ln
+    return re.sub(r" +", " ", out).strip()
 
 
 class PDFRenderer:
